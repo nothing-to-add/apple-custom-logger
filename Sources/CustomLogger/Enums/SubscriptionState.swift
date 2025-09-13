@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum SubscriptionState {
+public enum SubscriptionState {
     case loading
     case active
     case inactive
@@ -20,7 +20,7 @@ enum SubscriptionState {
     case restored
     case pending
     
-    var description: String {
+    public var description: String {
         switch self {
         case .loading: return "Loading subscription status"
         case .active: return "Subscription active"
@@ -33,7 +33,7 @@ enum SubscriptionState {
         }
     }
     
-    var logLevel: LogLevel {
+    public var logLevel: LogLevel {
         switch self {
         case .loading: return .info
         case .active: return .info

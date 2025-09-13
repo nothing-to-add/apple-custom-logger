@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum AppLifecycleEvent {
+public enum AppLifecycleEvent {
     case launching
     case launched
     case backgrounding
@@ -18,7 +18,7 @@ enum AppLifecycleEvent {
     case terminating
     case memoryWarning
     
-    var description: String {
+    public var description: String {
         switch self {
         case .launching: return "App is launching"
         case .launched: return "App launch completed"

@@ -11,7 +11,7 @@
 import Foundation
 
 // MARK: - Log Categories
-enum LogCategory {
+public enum LogCategory {
     case app
     case auth
     case data
@@ -27,7 +27,7 @@ enum LogCategory {
     case notification
     case premium
     
-    var emoji: String {
+    public var emoji: String {
         switch self {
         case .app: return "📱"
         case .auth: return "🔐"
@@ -46,7 +46,7 @@ enum LogCategory {
         }
     }
     
-    var osLogCategory: String {
+    public var osLogCategory: String {
         switch self {
         case .app: return "App"
         case .auth: return "Authentication"

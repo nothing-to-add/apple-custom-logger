@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum SyncState {
+public enum SyncState {
     case idle
     case syncing
     case syncCompleted
@@ -18,7 +18,7 @@ enum SyncState {
     case conflictResolved
     case offline
     
-    var description: String {
+    public var description: String {
         switch self {
         case .idle: return "Sync idle"
         case .syncing: return "Syncing data"
@@ -29,7 +29,7 @@ enum SyncState {
         }
     }
     
-    var logLevel: LogLevel {
+    public var logLevel: LogLevel {
         switch self {
         case .idle: return .debug
         case .syncing: return .info

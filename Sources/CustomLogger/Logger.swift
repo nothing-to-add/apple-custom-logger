@@ -15,14 +15,14 @@ import os.log
 /// Provides structured logging with emoji-based visual categorization
 /// and different log levels for various app states and events
 @MainActor
-final class Logger: Sendable {
+public final class Logger: Sendable {
     
     // MARK: - Shared Subsystem
     nonisolated(unsafe) private static var _subsystem: String?
     nonisolated private static let subsystemLock = NSLock()
     
     /// The subsystem shared by all Logger instances. Once set, it cannot be changed.
-    nonisolated static var subsystem: String? {
+    nonisolated public static var subsystem: String? {
         subsystemLock.lock()
         defer { subsystemLock.unlock() }
         return _subsystem
@@ -44,7 +44,7 @@ final class Logger: Sendable {
     #if DEBUG
     /// Reset the subsystem for testing purposes only.
     /// This method should only be used in unit tests.
-    nonisolated static func _resetSubsystemForTesting() {
+    nonisolated public static func _resetSubsystemForTesting() {
         subsystemLock.lock()
         defer { subsystemLock.unlock() }
         _subsystem = nil
@@ -62,7 +62,7 @@ final class Logger: Sendable {
     /// Initialize a Logger with the specified subsystem.
     /// - Parameter subsystem: The subsystem identifier for logging. Must be the same for all Logger instances.
     /// - Throws: `LoggerError.subsystemAlreadySet` if a different subsystem was already set by another Logger instance.
-    init(subsystem: String) throws {
+    public init(subsystem: String) throws {
         try Self.setSubsystem(subsystem)
         self.subsystem = subsystem
         configureLogging()
@@ -78,7 +78,7 @@ final class Logger: Sendable {
     }
     
     /// Configure logging settings
-    func configure(
+    public func configure(
         minimumLevel: LogLevel = .debug,
         enabled: Bool = true,
         consoleLogging: Bool = true,
@@ -125,7 +125,7 @@ final class Logger: Sendable {
     // MARK: - Convenience Methods by Level
     
     /// Log debug information
-    func debug(
+    public func debug(
         _ message: String,
         category: LogCategory = .app,
         context: String? = nil,
@@ -137,7 +137,7 @@ final class Logger: Sendable {
     }
     
     /// Log informational messages
-    func info(
+    public func info(
         _ message: String,
         category: LogCategory = .app,
         context: String? = nil,
@@ -149,7 +149,7 @@ final class Logger: Sendable {
     }
     
     /// Log warning messages
-    func warning(
+    public func warning(
         _ message: String,
         category: LogCategory = .error,
         context: String? = nil,
@@ -161,7 +161,7 @@ final class Logger: Sendable {
     }
     
     /// Log error messages
-    func error(
+    public func error(
         _ message: String,
         category: LogCategory = .error,
         context: String? = nil,
@@ -173,7 +173,7 @@ final class Logger: Sendable {
     }
     
     /// Log critical errors
-    func critical(
+    public func critical(
         _ message: String,
         category: LogCategory = .error,
         context: String? = nil,
@@ -187,7 +187,7 @@ final class Logger: Sendable {
     // MARK: - Specialized Logging Methods
     
     /// Log user actions
-    func userAction(
+    public func userAction(
         _ action: String,
         details: String? = nil,
         file: String = #file,
@@ -199,7 +199,7 @@ final class Logger: Sendable {
     }
     
     /// Log authentication events
-    func auth(
+    public func auth(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -210,7 +210,7 @@ final class Logger: Sendable {
     }
     
     /// Log Firebase operations
-    func firebase(
+    public func firebase(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -221,7 +221,7 @@ final class Logger: Sendable {
     }
     
     /// Log data operations
-    func data(
+    public func data(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -232,7 +232,7 @@ final class Logger: Sendable {
     }
     
     /// Log sync operations
-    func sync(
+    public func sync(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -243,7 +243,7 @@ final class Logger: Sendable {
     }
     
     /// Log subscription events
-    func subscription(
+    public func subscription(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -254,7 +254,7 @@ final class Logger: Sendable {
     }
     
     /// Log premium status changes
-    func premium(
+    public func premium(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -265,7 +265,7 @@ final class Logger: Sendable {
     }
     
     /// Log performance metrics
-    func performance(
+    public func performance(
         _ message: String,
         duration: TimeInterval? = nil,
         file: String = #file,
@@ -277,7 +277,7 @@ final class Logger: Sendable {
     }
     
     /// Log network operations
-    func network(
+    public func network(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -288,7 +288,7 @@ final class Logger: Sendable {
     }
     
     /// Log configuration changes
-    func configuration(
+    public func configuration(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -299,7 +299,7 @@ final class Logger: Sendable {
     }
     
     /// Log UI events
-    func ui(
+    public func ui(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -310,7 +310,7 @@ final class Logger: Sendable {
     }
     
     /// Log notification events
-    func notification(
+    public func notification(
         _ message: String,
         level: LogLevel = .info,
         file: String = #file,
@@ -323,31 +323,31 @@ final class Logger: Sendable {
     // MARK: - State Logging Methods
     
     /// Log app lifecycle events
-    func appLifecycle(_ event: AppLifecycleEvent, details: String? = nil) {
+    public func appLifecycle(_ event: AppLifecycleEvent, details: String? = nil) {
         let message = details.map { "\(event.description) - \($0)" } ?? event.description
         log(level: .info, category: .app, message: message)
     }
     
     /// Log authentication state changes
-    func authState(_ state: AuthState, userInfo: String? = nil) {
+    public func authState(_ state: AuthState, userInfo: String? = nil) {
         let message = userInfo.map { "\(state.description) - \($0)" } ?? state.description
         log(level: .info, category: .auth, message: message)
     }
     
     /// Log data sync states
-    func syncState(_ state: SyncState, details: String? = nil) {
+    public func syncState(_ state: SyncState, details: String? = nil) {
         let message = details.map { "\(state.description) - \($0)" } ?? state.description
         log(level: state.logLevel, category: .sync, message: message)
     }
     
     /// Log Firebase connection states
-    func firebaseState(_ state: FirebaseState, details: String? = nil) {
+    public func firebaseState(_ state: FirebaseState, details: String? = nil) {
         let message = details.map { "\(state.description) - \($0)" } ?? state.description
         log(level: state.logLevel, category: .firebase, message: message)
     }
     
     /// Log subscription states
-    func subscriptionState(_ state: SubscriptionState, productId: String? = nil) {
+    public func subscriptionState(_ state: SubscriptionState, productId: String? = nil) {
         let message = productId.map { "\(state.description) - \($0)" } ?? state.description
         log(level: state.logLevel, category: .subscription, message: message)
     }
@@ -355,7 +355,7 @@ final class Logger: Sendable {
     // MARK: - Utility Methods
     
     /// Log method entry for debugging
-    func methodEntry(
+    public func methodEntry(
         _ method: String = #function,
         file: String = #file,
         line: Int = #line
@@ -365,7 +365,7 @@ final class Logger: Sendable {
     }
     
     /// Log method exit for debugging
-    func methodExit(
+    public func methodExit(
         _ method: String = #function,
         file: String = #file,
         line: Int = #line
@@ -375,7 +375,7 @@ final class Logger: Sendable {
     }
     
     /// Log timing information
-    func time<T: Sendable>(
+    public func time<T: Sendable>(
         _ operation: String,
         category: LogCategory = .performance,
         execute: () throws -> T
@@ -389,7 +389,7 @@ final class Logger: Sendable {
     }
     
     /// Log timing information for async operations
-    func timeAsync<T: Sendable>(
+    public func timeAsync<T: Sendable>(
         _ operation: String,
         category: LogCategory = .performance,
         execute: () async throws -> T

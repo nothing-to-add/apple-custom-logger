@@ -12,14 +12,14 @@ import Foundation
 import os.log
 
 // MARK: - Log Levels
-enum LogLevel: String, CaseIterable {
+public enum LogLevel: String, CaseIterable {
     case debug = "DEBUG"
     case info = "INFO"
     case warning = "WARNING"
     case error = "ERROR"
     case critical = "CRITICAL"
     
-    var priority: Int {
+    public var priority: Int {
         switch self {
         case .debug: return 0
         case .info: return 1
@@ -33,7 +33,7 @@ enum LogLevel: String, CaseIterable {
 // MARK: - Extensions
 
 extension LogLevel {
-    var osLogType: OSLogType {
+    public var osLogType: OSLogType {
         switch self {
         case .debug: return .debug
         case .info: return .info

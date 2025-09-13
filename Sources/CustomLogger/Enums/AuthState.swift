@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum AuthState {
+public enum AuthState {
     case signedOut
     case signingIn
     case signedIn
@@ -19,7 +19,7 @@ enum AuthState {
     case tokenRefresh
     case tokenExpired
     
-    var description: String {
+    public var description: String {
         switch self {
         case .signedOut: return "User signed out"
         case .signingIn: return "User signing in"

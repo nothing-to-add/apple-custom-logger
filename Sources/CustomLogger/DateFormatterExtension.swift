@@ -11,7 +11,7 @@
 import Foundation
 
 extension DateFormatter {
-    static let logTimestamp: DateFormatter = {
+    public static let logTimestamp: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSS"
         return formatter
@@ -19,7 +19,7 @@ extension DateFormatter {
 }
 
 extension DateFormatter {
-    static let shortDateFormatter: DateFormatter = {
+    public static let shortDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none

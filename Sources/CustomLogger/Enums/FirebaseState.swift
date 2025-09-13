@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum FirebaseState {
+public enum FirebaseState {
     case connecting
     case connected
     case disconnected
@@ -18,7 +18,7 @@ enum FirebaseState {
     case configurationFailed
     case authenticationChanged
     
-    var description: String {
+    public var description: String {
         switch self {
         case .connecting: return "Connecting to Firebase"
         case .connected: return "Connected to Firebase"
@@ -29,7 +29,7 @@ enum FirebaseState {
         }
     }
     
-    var logLevel: LogLevel {
+    public var logLevel: LogLevel {
         switch self {
         case .connecting: return .info
         case .connected: return .info
