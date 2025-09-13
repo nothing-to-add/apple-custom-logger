@@ -1,8 +1,18 @@
-# apple-custom-logge### Zero Dependencies**: Pure Swift implementation with no external dependencies
-- **Performance Focused**: Minimal overhead with efficient logging mechanisms
+# apple-custom-logger
+
+[![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS_13+_|_macOS_11+_|_watchOS_7+_|_visionOS_1+-blue.svg)](https://developer.apple.com)
+[![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-brightgreen.svg)](https://swift.org/package-manager/)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/nothing-to-add/apple-custom-logger)](https://github.com/nothing-to-add/apple-custom-logger/releases)
+[![GitHub Issues](https://img.shields.io/github/issues/nothing-to-add/apple-custom-logger)](https://github.com/nothing-to-add/apple-custom-logger/issues)
+
+A comprehensive logging framework for Apple platform applications that provides structured logging with emoji-based visual categorization and different log levels for various app states and events.
 
 ## Table of Contents
 
+- [About This Package](#about-this-package)
+- [Features](#features)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
@@ -20,14 +30,6 @@
 - [Compatibility](#compatibility)
 - [Contributing](#contributing)
 - [License](#license)
-[![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-iOS_13+_|_macOS_11+_|_watchOS_7+_|_visionOS_1+-blue.svg)](https://developer.apple.com)
-[![Swift Package Manager](https://img.shields.io/badge/Swift_Package_Manager-compatible-brightgreen.svg)](https://swift.org/package-manager/)
-[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
-[![GitHub Release](https://img.shields.io/github/v/release/nothing-to-add/apple-custom-logger)](https://github.com/nothing-to-add/apple-custom-logger/releases)
-[![GitHub Issues](https://img.shields.io/github/issues/nothing-to-add/apple-custom-logger)](https://github.com/nothing-to-add/apple-custom-logger/issues)
-
-A comprehensive logging framework for Apple platform applications that provides structured logging with emoji-based visual categorization and different log levels for various app states and events.
 
 ## About This Package
 
