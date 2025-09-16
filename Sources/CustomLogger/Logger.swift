@@ -14,42 +14,11 @@ import os.log
 /// A comprehensive logging service for the Gratitude Jar app
 /// Provides structured logging with emoji-based visual categorization
 /// and different log levels for various app states and events
-@MainActor
-public final class Logger: Sendable {
+public final class Logger: @unchecked Sendable {
     
-    // MARK: - Shared Subsystem
-    nonisolated(unsafe) private static var _subsystem: String?
-    nonisolated private static let subsystemLock = NSLock()
-    
-    /// The subsystem shared by all Logger instances. Once set, it cannot be changed.
-    nonisolated public static var subsystem: String? {
-        subsystemLock.lock()
-        defer { subsystemLock.unlock() }
-        return _subsystem
-    }
-    
-    nonisolated private static func setSubsystem(_ subsystem: String) throws {
-        subsystemLock.lock()
-        defer { subsystemLock.unlock() }
-        
-        if let existingSubsystem = _subsystem {
-            if existingSubsystem != subsystem {
-                throw LoggerError.subsystemAlreadySet(existing: existingSubsystem, attempted: subsystem)
-            }
-        } else {
-            _subsystem = subsystem
-        }
-    }
-    
-    #if DEBUG
-    /// Reset the subsystem for testing purposes only.
-    /// This method should only be used in unit tests.
-    nonisolated public static func _resetSubsystemForTesting() {
-        subsystemLock.lock()
-        defer { subsystemLock.unlock() }
-        _subsystem = nil
-    }
-    #endif
+    // MARK: - Singleton
+    /// The shared Logger instance
+    public static let shared = Logger()
     
     // MARK: - Properties
     private let subsystem: String
@@ -59,14 +28,44 @@ public final class Logger: Sendable {
     private var shouldLogToOSLog: Bool = true
     
     // MARK: - Initialization
-    /// Initialize a Logger with the specified subsystem.
-    /// - Parameter subsystem: The subsystem identifier for logging. Must be the same for all Logger instances.
-    /// - Throws: `LoggerError.subsystemAlreadySet` if a different subsystem was already set by another Logger instance.
-    public init(subsystem: String) throws {
-        try Self.setSubsystem(subsystem)
-        self.subsystem = subsystem
+    /// Private initializer for singleton pattern. Automatically derives subsystem from bundle identifier.
+    private init() {
+        self.subsystem = Self.deriveSubsystemFromBundleId()
         configureLogging()
     }
+    
+    /// Derives a subset of the bundle identifier to use as subsystem
+    private static func deriveSubsystemFromBundleId() -> String {
+        guard let bundleId = Bundle.main.bundleIdentifier else {
+            return "unknown.app"
+        }
+        
+        // Split bundle ID by dots and take last 2 components for subsystem
+        // e.g., "com.company.myapp" -> "company.myapp"
+        let components = bundleId.split(separator: ".")
+        if components.count >= 2 {
+            return String(components.suffix(2).joined(separator: "."))
+        } else {
+            return bundleId
+        }
+    }
+    
+    /// Get the current subsystem identifier
+    public var currentSubsystem: String {
+        return subsystem
+    }
+    
+    #if DEBUG
+    /// Reset the logger for testing purposes only.
+    /// This method should only be used in unit tests.
+    public static func _resetForTesting() {
+        // Reset configuration to defaults
+        shared.minimumLogLevel = .debug
+        shared.isEnabled = true
+        shared.shouldLogToConsole = true
+        shared.shouldLogToOSLog = true
+    }
+    #endif
     
     // MARK: - Configuration
     private func configureLogging() {

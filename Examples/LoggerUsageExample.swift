@@ -12,71 +12,70 @@ import Foundation
 
 // MARK: - Logger Usage Examples
 
-@MainActor
 class LoggerUsageExample {
     
     // MARK: - Basic Usage
     
-    /// Example of creating a Logger with a subsystem
-    func createLogger() throws {
-        // Create the first Logger instance with a subsystem
-        let logger1 = try Logger(subsystem: "com.myapp.main")
+    /// Example of using the shared Logger instance
+    func createLogger() {
+        // Use the shared logger instance - subsystem is automatically derived from bundle ID
+        let logger = Logger.shared
         
-        // Create another Logger instance with the same subsystem - this works
-        let logger2 = try Logger(subsystem: "com.myapp.main")
+        // Get the automatically derived subsystem
+        print("Automatically derived subsystem: \(logger.currentSubsystem)")
         
-        // Both loggers use the same subsystem
-        print("Logger 1 subsystem: \(Logger.subsystem ?? "nil")")
-        print("Logger 2 subsystem: \(Logger.subsystem ?? "nil")")
+        logger.info("Hello from shared logger")
         
-        logger1.info("Hello from logger 1")
-        logger2.info("Hello from logger 2")
+        // All references to Logger.shared use the same instance and subsystem
+        let anotherReference = Logger.shared
+        anotherReference.info("Same logger instance")
     }
     
-    /// Example of what happens when trying to use a different subsystem
-    func demonstrateSubsystemError() {
-        do {
-            // Create first logger
-            let logger1 = try Logger(subsystem: "com.myapp.main")
-            logger1.info("First logger created successfully")
-            
-            // Try to create second logger with different subsystem - this will throw an error
-            let logger2 = try Logger(subsystem: "com.myapp.different")
-            logger2.info("This won't be reached")
-            
-        } catch LoggerError.subsystemAlreadySet(let existing, let attempted) {
-            print("Error: Cannot change subsystem from '\(existing)' to '\(attempted)'")
-        } catch {
-            print("Unexpected error: \(error)")
-        }
+    /// Example of accessing the logger from anywhere in your app
+    func accessLoggerAnywhere() {
+        // Access the logger from anywhere - no initialization needed
+        Logger.shared.info("Logging from anywhere in the app")
+        Logger.shared.userAction("User performed action")
+    }
+    
+    /// Example of singleton pattern benefits
+    func demonstrateSimplicity() {
+        // No more error handling or initialization complexity
+        Logger.shared.info("Simple and clean")
+        
+        // No need to pass logger instances around
+        performSomeOperation()
+        
+        // Always the same subsystem, always available
+        print("Current subsystem: \(Logger.shared.currentSubsystem)")
+    }
+    
+    private func performSomeOperation() {
+        // Can access logger directly without dependency injection
+        Logger.shared.debug("Performing operation")
     }
     
     // MARK: - Advanced Usage
     
     /// Example of using Logger in different parts of an app
-    func multiModuleUsage() throws {
-        // Main app logger
-        let appLogger = try Logger(subsystem: "com.myapp.gratitude")
-        appLogger.info("App started", category: .app)
+    func multiModuleUsage() {
+        // All modules use the same shared logger instance
+        Logger.shared.info("App started", category: .app)
         
-        // Network module logger - same subsystem, different usage
-        let networkLogger = try Logger(subsystem: "com.myapp.gratitude")
-        networkLogger.network("Making API request")
+        // Network module
+        Logger.shared.network("Making API request")
         
-        // Auth module logger - same subsystem
-        let authLogger = try Logger(subsystem: "com.myapp.gratitude")
-        authLogger.auth("User login attempt")
+        // Auth module
+        Logger.shared.auth("User login attempt")
         
-        // All loggers share the same subsystem
-        print("Shared subsystem: \(Logger.subsystem ?? "nil")")
+        // All references use the same subsystem automatically
+        print("Shared subsystem: \(Logger.shared.currentSubsystem)")
     }
     
     /// Example of configuring logger behavior
-    func configureLogger() throws {
-        let logger = try Logger(subsystem: "com.myapp.configured")
-        
-        // Configure logging behavior
-        logger.configure(
+    func configureLogger() {
+        // Configure the shared logger instance
+        Logger.shared.configure(
             minimumLevel: .info,
             enabled: true,
             consoleLogging: true,
@@ -84,37 +83,35 @@ class LoggerUsageExample {
         )
         
         // These won't be logged due to minimum level being .info
-        logger.debug("This debug message won't appear")
+        Logger.shared.debug("This debug message won't appear")
         
         // These will be logged
-        logger.info("This info message will appear")
-        logger.warning("This warning will appear")
-        logger.error("This error will appear")
+        Logger.shared.info("This info message will appear")
+        Logger.shared.warning("This warning will appear")
+        Logger.shared.error("This error will appear")
     }
     
     /// Example of specialized logging methods
-    func specializedLogging() throws {
-        let logger = try Logger(subsystem: "com.myapp.specialized")
-        
-        // User action logging
-        logger.userAction("Button tapped", details: "Login button")
+    func specializedLogging() {
+        // Use the shared logger for all specialized logging
+        Logger.shared.userAction("Button tapped", details: "Login button")
         
         // Performance monitoring
-        let result = logger.time("Database query") {
+        let result = Logger.shared.time("Database query") {
             // Simulate some work
             Thread.sleep(forTimeInterval: 0.1)
             return "Query result"
         }
         
         // State logging
-        logger.appLifecycle(.didFinishLaunching, details: "App launched successfully")
-        logger.authState(.signedIn, userInfo: "user@example.com")
-        logger.syncState(.syncing, details: "Syncing user data")
+        Logger.shared.appLifecycle(.didFinishLaunching, details: "App launched successfully")
+        Logger.shared.authState(.signedIn, userInfo: "user@example.com")
+        Logger.shared.syncState(.syncing, details: "Syncing user data")
         
         // Method tracing
-        logger.methodEntry()
+        Logger.shared.methodEntry()
         // ... do some work ...
-        logger.methodExit()
+        Logger.shared.methodExit()
     }
 }
 
@@ -125,24 +122,17 @@ Example of how to use the Logger in a SwiftUI app:
 
 @main
 struct MyApp: App {
-    private let logger: Logger
-    
     init() {
-        do {
-            // Initialize logger with your app's subsystem
-            self.logger = try Logger(subsystem: "com.mycompany.myapp")
-            logger.appLifecycle(.willFinishLaunching)
-        } catch {
-            // Handle initialization error
-            fatalError("Failed to initialize logger: \(error)")
-        }
+        // Configure the shared logger at app startup
+        Logger.shared.configure(minimumLevel: .info)
+        Logger.shared.appLifecycle(.willFinishLaunching)
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .onAppear {
-                    logger.appLifecycle(.didFinishLaunching)
+                    Logger.shared.appLifecycle(.didFinishLaunching)
                 }
         }
     }
@@ -150,15 +140,12 @@ struct MyApp: App {
 
 // In your views or view models:
 class ContentViewModel: ObservableObject {
-    private let logger: Logger
-    
-    init() throws {
-        // All Logger instances must use the same subsystem
-        self.logger = try Logger(subsystem: "com.mycompany.myapp")
+    init() {
+        // No initialization needed - just use the shared instance
     }
     
     func performAction() {
-        logger.userAction("Performed important action")
+        Logger.shared.userAction("Performed important action")
         // ... rest of the method
     }
 }

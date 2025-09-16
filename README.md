@@ -14,10 +14,11 @@ A comprehensive logging framework for Apple platform applications that provides 
 - [About This Package](#about-this-package)
 - [Features](#features)
 - [Installation](#installation)
+- [What's New in 1.0.1](#whats-new-in-101)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
   - [Basic Setup](#basic-setup)
-  - [Subsystem Management](#subsystem-management)
+  - [Singleton Pattern](#singleton-pattern)
   - [Configuration](#configuration)
   - [Specialized Logging](#specialized-logging)
   - [Category-Based Logging](#category-based-logging)
@@ -42,16 +43,19 @@ A comprehensive logging framework for Apple platform applications that provides 
 - **Type-Safe Architecture**: Swift-native design with comprehensive error handling and type safety
 - **Zero Dependencies**: Pure Swift implementation with no external dependencies
 - **Performance Focused**: Minimal overhead with efficient logging mechanisms
+- **Automatic Setup**: Subsystem automatically derived from bundle identifier for zero-configuration usage
+- **Singleton Pattern**: Global access via `Logger.shared` eliminates initialization complexity
 
 ## Features
 
 - 🎯 **Structured Logging**: Organized logging with categories and levels
-- 🔒 **Thread-Safe**: Safe to use across multiple threads with `@MainActor`
+- 🔒 **Thread-Safe**: Safe to use across multiple threads with proper internal synchronization
 - 📱 **Apple Ecosystem**: Built specifically for iOS, macOS, watchOS, and tvOS
 - 🎨 **Visual Categories**: Emoji-based categorization for easy log identification
 - ⚡ **Performance Monitoring**: Built-in timing and performance logging
 - 🔧 **Configurable**: Adjustable log levels and output destinations
-- 🚀 **Subsystem Management**: Consistent subsystem across all logger instances
+- 🚀 **Singleton Pattern**: Global access with `Logger.shared` - no initialization needed
+- 🛠️ **Automatic Subsystem**: Derives subsystem automatically from bundle identifier
 
 ## Installation
 
@@ -59,7 +63,7 @@ A comprehensive logging framework for Apple platform applications that provides 
 
 1. **In Xcode**: Go to `File` → `Add Package Dependencies...`
 2. **Enter URL**: `https://github.com/nothing-to-add/apple-custom-logger.git`
-3. **Version Rule**: Select "Up to Next Major Version" and enter `1.0.0`
+3. **Version Rule**: Select "Up to Next Major Version" and enter `1.0.1`
 4. **Add to Target**: Select your app target and click "Add Package"
 
 ### Swift Package Manager (Package.swift)
@@ -79,7 +83,7 @@ let package = Package(
         .visionOS(.v1)
     ],
     dependencies: [
-        .package(url: "https://github.com/nothing-to-add/apple-custom-logger.git", from: "1.0.0")
+        .package(url: "https://github.com/nothing-to-add/apple-custom-logger.git", from: "1.0.1")
     ],
     targets: [
         .target(
@@ -111,31 +115,56 @@ If you prefer CocoaPods, you can reference the GitHub repository:
 
 ```ruby
 # Podfile
-pod 'CustomLogger', :git => 'https://github.com/nothing-to-add/apple-custom-logger.git', :tag => '1.0.0'
+pod 'CustomLogger', :git => 'https://github.com/nothing-to-add/apple-custom-logger.git', :tag => '1.0.1'
 ```
 
 *Note: This package is primarily designed for Swift Package Manager. CocoaPods support may require additional configuration.*
+
+## What's New in 1.0.1
+
+🎉 **Major Simplification**: Version 1.0.1 introduces a revolutionary singleton pattern that makes logging incredibly simple and intuitive!
+
+### Key Improvements
+
+- **🚀 Singleton Pattern**: Access the logger globally with `Logger.shared` - no more complex initialization
+- **🛠️ Automatic Subsystem**: Subsystem automatically derived from your app's bundle identifier 
+- **❌ No Error Handling**: Eliminated the need for `try/catch` blocks when creating logger instances
+- **🔄 Thread Safety**: Enhanced thread safety with internal synchronization instead of `@MainActor`
+- **🎯 Zero Configuration**: Works out of the box with sensible defaults
+- **📦 Backward Compatible**: Existing logging methods work exactly the same
+
+### Migration from 1.0.0
+
+```swift
+// OLD (1.0.0) - Complex initialization
+do {
+    let logger = try Logger(subsystem: "com.myapp.main")
+    logger.info("Hello world")
+} catch {
+    // Handle error
+}
+
+// NEW (1.0.1) - Simple singleton pattern
+Logger.shared.info("Hello world")  // That's it! 🎉
+```
 
 ## Quick Start
 
 ```swift
 import CustomLogger
 
-// 1. Initialize the logger with your app's bundle identifier
-let logger = try Logger(subsystem: "com.yourcompany.yourapp")
+// 1. Use the shared logger instance (subsystem automatically derived from bundle ID)
+Logger.shared.info("App initialized successfully")
 
-// 2. Configure logging preferences (optional)
-logger.configure(
+// 2. Configure logging preferences globally (optional)
+Logger.shared.configure(
     minimumLevel: .info,
-    enabled: true,
-    consoleLogging: true,
     osLogging: true
 )
 
-// 3. Start logging!
-logger.info("App initialized successfully")
-logger.userAction("User tapped login button")
-logger.error("Network request failed")
+// 3. Use anywhere in your app - no initialization needed!
+Logger.shared.userAction("User tapped login button")
+Logger.shared.error("Network request failed")
 ```
 
 ## Usage
@@ -145,40 +174,40 @@ logger.error("Network request failed")
 ```swift
 import CustomLogger
 
-// Initialize logger with your app's subsystem
-// All Logger instances MUST use the same subsystem
-let logger = try Logger(subsystem: "com.mycompany.myapp")
+// Use the shared logger instance - no initialization required
+Logger.shared.info("App started successfully")
+Logger.shared.warning("Low memory warning")
+Logger.shared.error("Failed to load data")
 
-// Basic logging
-logger.info("App started successfully")
-logger.warning("Low memory warning")
-logger.error("Failed to load data")
+// Check the automatically derived subsystem
+print("Current subsystem: \(Logger.shared.currentSubsystem)")
 ```
 
-### Subsystem Management
+### Singleton Pattern
 
-The Logger enforces that all instances use the same subsystem. Once set, the subsystem cannot be changed:
+The Logger uses a singleton pattern with automatic subsystem derivation:
 
 ```swift
-// First logger sets the subsystem
-let logger1 = try Logger(subsystem: "com.myapp.main")
+// Access the shared logger from anywhere
+Logger.shared.info("This works from any module")
 
-// This works - same subsystem
-let logger2 = try Logger(subsystem: "com.myapp.main")
+// The subsystem is automatically derived from bundle ID:
+// Bundle ID: "com.mycompany.myapp" → Subsystem: "mycompany.myapp"
+// Bundle ID: "org.example.greatapp" → Subsystem: "example.greatapp"
 
-// This throws an error - different subsystem
-let logger3 = try Logger(subsystem: "com.myapp.different") // ❌ Throws LoggerError.subsystemAlreadySet
+// Get the current subsystem
+let subsystem = Logger.shared.currentSubsystem
+print("Using subsystem: \(subsystem)")
+
+// Configuration affects the global logger instance
+Logger.shared.configure(minimumLevel: .info, enabled: true)
 ```
 
 ### Configuration
 
 ```swift
-let logger = try Logger(subsystem: "com.myapp.main")
-
-logger.configure(
+Logger.shared.configure(
     minimumLevel: .info,        // Only log .info and above
-    enabled: true,              // Enable logging
-    consoleLogging: true,       // Log to console
     osLogging: true            // Log to OS unified logging
 )
 ```
@@ -187,47 +216,42 @@ logger.configure(
 
 ```swift
 // User actions
-logger.userAction("Button tapped", details: "Login button")
+Logger.shared.userAction("Button tapped", details: "Login button")
 
 // Performance monitoring
-let result = logger.time("Database query") {
+let result = Logger.shared.time("Database query") {
     // Your expensive operation here
     return performDatabaseQuery()
 }
 
 // State logging
-logger.appLifecycle(.didFinishLaunching, details: "App launched")
-logger.authState(.signedIn, userInfo: "user@example.com")
-logger.syncState(.syncing, details: "Syncing user data")
+Logger.shared.appLifecycle(.didFinishLaunching, details: "App launched")
+Logger.shared.authState(.signedIn, userInfo: "user@example.com")
+Logger.shared.syncState(.syncing, details: "Syncing user data")
 
 // Method tracing
-logger.methodEntry()
+Logger.shared.methodEntry()
 // ... method implementation
-logger.methodExit()
+Logger.shared.methodExit()
 ```
 
 ### Category-Based Logging
 
 ```swift
-logger.auth("User authentication successful")
-logger.firebase("Connected to Firebase")
-logger.data("Saved user preferences")
-logger.network("API request completed")
-logger.ui("View controller appeared")
-logger.performance("Startup completed", duration: 0.5)
+Logger.shared.auth("User authentication successful")
+Logger.shared.firebase("Connected to Firebase")
+Logger.shared.data("Saved user preferences")
+Logger.shared.network("API request completed")
+Logger.shared.ui("View controller appeared")
+Logger.shared.performance("Startup completed", duration: 0.5)
 ```
 
 ### Error Handling
 
 ```swift
-do {
-    let logger = try Logger(subsystem: "com.myapp.main")
-    logger.info("Logger initialized successfully")
-} catch LoggerError.subsystemAlreadySet(let existing, let attempted) {
-    print("Error: Cannot change subsystem from '\(existing)' to '\(attempted)'")
-} catch {
-    print("Unexpected error: \(error)")
-}
+// No error handling needed with singleton pattern!
+Logger.shared.info("Logger is always ready to use")
+print("Using subsystem: \(Logger.shared.currentSubsystem)")
 ```
 
 ### SwiftUI Integration
@@ -235,22 +259,17 @@ do {
 ```swift
 @main
 struct MyApp: App {
-    private let logger: Logger
-    
     init() {
-        do {
-            self.logger = try Logger(subsystem: "com.mycompany.myapp")
-            logger.appLifecycle(.willFinishLaunching)
-        } catch {
-            fatalError("Failed to initialize logger: \(error)")
-        }
+        // Configure the shared logger at app startup
+        Logger.shared.configure(minimumLevel: .info)
+        Logger.shared.appLifecycle(.willFinishLaunching)
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .onAppear {
-                    logger.appLifecycle(.didFinishLaunching)
+                    Logger.shared.appLifecycle(.didFinishLaunching)
                 }
         }
     }
@@ -285,7 +304,7 @@ struct MyApp: App {
 
 ## Thread Safety
 
-The Logger is marked with `@MainActor` and implements `Sendable`, making it safe to use in concurrent environments while ensuring all logging operations happen on the main actor.
+The Logger singleton is implemented with `@unchecked Sendable` and uses proper synchronization internally, making it safe to use across multiple threads and contexts without additional synchronization requirements.
 
 ## Requirements
 

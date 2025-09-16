@@ -12,12 +12,13 @@ import Foundation
 
 // MARK: - Logger Errors
 public enum LoggerError: Error, LocalizedError {
-    case subsystemAlreadySet(existing: String, attempted: String)
+    // Reserved for future error cases
+    case configurationError(String)
     
     public var errorDescription: String? {
         switch self {
-        case .subsystemAlreadySet(let existing, let attempted):
-            return "Logger subsystem is already set to '\(existing)'. Cannot change to '\(attempted)'. All Logger instances must use the same subsystem."
+        case .configurationError(let message):
+            return "Logger configuration error: \(message)"
         }
     }
 }
